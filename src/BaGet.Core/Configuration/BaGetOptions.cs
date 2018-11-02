@@ -38,6 +38,9 @@ namespace BaGet.Core
         /// </summary>
         public bool IsReadOnlyMode { get; set; } = false;
 
+        public string Username { get; set; }
+        public string Password { get; set; }
+
         [Required]
         public DatabaseOptions Database { get; set; }
 
