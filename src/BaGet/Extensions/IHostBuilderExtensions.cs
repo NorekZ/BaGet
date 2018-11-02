@@ -16,7 +16,8 @@ namespace BaGet.Extensions
 
                 config
                     .SetBasePath(Environment.CurrentDirectory)
-                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true);
+                    .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
+                    .AddJsonFile("appsettings.override.json", optional: true, reloadOnChange: true);
 
                 if (args != null)
                 {

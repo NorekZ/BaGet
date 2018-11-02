@@ -8,6 +8,9 @@
         /// </summary>
         public string ApiKeyHash { get; set; }
 
+        public string Username { get; set; }
+        public string Password { get; set; }
+
         public DatabaseOptions Database { get; set; }
         public StorageOptions Storage { get; set; }
         public SearchOptions Search { get; set; }
