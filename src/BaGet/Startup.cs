@@ -3,6 +3,8 @@ using BaGet.Configuration;
 using BaGet.Core;
 using BaGet.Core.Server.Extensions;
 using BaGet.Extensions;
+using BaGet.Web.Extensions;
+using idunno.Authentication.Basic;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
