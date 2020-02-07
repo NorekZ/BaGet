@@ -1,9 +1,10 @@
 using System;
 using BaGet.Configuration;
 using BaGet.Core;
+using BaGet.Core.Server;
 using BaGet.Core.Server.Extensions;
 using BaGet.Extensions;
-using idunno.Authentication.Basic;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.SpaServices.ReactDevelopmentServer;
@@ -32,42 +33,9 @@ namespace BaGet
                 configuration.RootPath = "BaGet.UI/build";
             });
 
-            services.AddAuthentication(BasicAuthenticationDefaults.AuthenticationScheme)
-                .AddBasic(options =>
-                {
-                    options.AllowInsecureProtocol = true;
-                    options.Realm = "baget";
-                    options.Events = new BasicAuthenticationEvents
-                    {
-                        OnValidateCredentials = context =>
-                        {
-                            var bagetOptions = context.HttpContext.RequestServices.GetService<IOptions<BaGetOptions>>().Value;
-
-                            if (context.Username == bagetOptions.Username && context.Password == bagetOptions.Password)
-                            {
-                                var claims = new[]
-                                {
-                                    new Claim(
-                                        ClaimTypes.NameIdentifier, 
-                                        context.Username, 
-                                        ClaimValueTypes.String, 
-                                        context.Options.ClaimsIssuer),
-                                    new Claim(
-                                        ClaimTypes.Name, 
-                                        context.Username, 
-                                        ClaimValueTypes.String, 
-                                        context.Options.ClaimsIssuer)
-                                };
-
-                                context.Principal = new ClaimsPrincipal(
-                                    new ClaimsIdentity(claims, context.Scheme.Name));
-                                context.Success();
-                            }
-
-                            return Task.CompletedTask;
-                        }
-                    };
-                });
+            // configure basic authentication 
+            services.AddAuthentication("BasicAuthentication")
+                .AddScheme<AuthenticationSchemeOptions, BasicAuthenticationHandler>("BasicAuthentication", null);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
