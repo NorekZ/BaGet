@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BaGet.Controllers
 {
-    [Authorize]
     public class SearchController : Controller
     {
         private readonly ISearchService _searchService;
