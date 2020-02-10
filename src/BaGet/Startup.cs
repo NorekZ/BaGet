@@ -54,6 +54,7 @@ namespace BaGet
             app.UseRouting();
 
             app.UseAuthentication();
+            app.UseAuthorization();
 
             app.UseForwardedHeaders();
             app.UsePathBase(options.PathBase);
