@@ -13,6 +13,9 @@ namespace BaGet.Core.Server
 {
     public class BasicAuthenticationHandler : AuthenticationHandler<AuthenticationSchemeOptions>
     {
+        private const string AuthorizationHeaderName = "Authorization";
+        private const string BasicSchemeName = "Basic";
+
         private readonly BaGetOptions _bagetOptions;
 
         public BasicAuthenticationHandler(
@@ -28,15 +31,27 @@ namespace BaGet.Core.Server
 
         protected override async Task<AuthenticateResult> HandleAuthenticateAsync()
         {
-            if (!Request.Headers.ContainsKey("Authorization"))
+            if (!Request.Headers.ContainsKey(AuthorizationHeaderName))
             {
-                return AuthenticateResult.Fail("Missing Authorization Header");
+                //Authorization header not in request
+                return AuthenticateResult.NoResult();
+            }
+
+            if (!AuthenticationHeaderValue.TryParse(Request.Headers[AuthorizationHeaderName], out var headerValue))
+            {
+                //Invalid Authorization header
+                return AuthenticateResult.NoResult();
+            }
+
+            if (!BasicSchemeName.Equals(headerValue.Scheme, StringComparison.OrdinalIgnoreCase))
+            {
+                //Not Basic authentication header
+                return AuthenticateResult.NoResult();
             }
 
             try
             {
-                var authHeader = AuthenticationHeaderValue.Parse(Request.Headers["Authorization"]);
-                var credentialBytes = Convert.FromBase64String(authHeader.Parameter);
+                var credentialBytes = Convert.FromBase64String(headerValue.Parameter);
                 var credentials = Encoding.UTF8.GetString(credentialBytes).Split(new[] { ':' }, 2);
                 var username = credentials[0];
                 var password = credentials[1];
@@ -60,6 +75,12 @@ namespace BaGet.Core.Server
             {
                 return AuthenticateResult.Fail("Invalid Authorization Header");
             }
+        }
+
+        protected override async Task HandleChallengeAsync(AuthenticationProperties properties)
+        {
+            Response.Headers["WWW-Authenticate"] = $"Basic realm=\"{_bagetOptions.Realm}\", charset=\"UTF-8\"";
+            await base.HandleChallengeAsync(properties);
         }
     }
 }
